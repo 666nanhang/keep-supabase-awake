@@ -9,8 +9,13 @@ jobs:
   ping:
     runs-on: ubuntu-latest
     steps:
-      - name: Ping Supabase API
+      - name: Keep Supabase awake (write then delete)
         run: |
-          curl -I "${{ secrets.SUPABASE_URL }}/rest/v1/feedback?select=*&limit=1" \
+          curl -X POST "${{ secrets.SUPABASE_URL }}/rest/v1/feedback" \
+            -H "apikey: ${{ secrets.SUPABASE_ANON_KEY }}" \
+            -H "Authorization: Bearer ${{ secrets.SUPABASE_ANON_KEY }}" \
+            -H "Content-Type: application/json" \
+            -d '{"optimization_suggestions": "keepalive"}'
+          curl -X DELETE "${{ secrets.SUPABASE_URL }}/rest/v1/feedback?optimization_suggestions=eq.keepalive" \
             -H "apikey: ${{ secrets.SUPABASE_ANON_KEY }}" \
             -H "Authorization: Bearer ${{ secrets.SUPABASE_ANON_KEY }}"
